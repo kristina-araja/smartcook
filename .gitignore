@@ -2,4 +2,5 @@ venv/
 .pytest_cache/
 **/__pycache__/**
 uploads/
-yolo11n.pt
+model/data
+model/runs
