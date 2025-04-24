@@ -1,11 +1,11 @@
 from ultralytics import YOLO
 
-model = YOLO("yolo11n.pt")
+model = YOLO("C:\\Users\\Kristina\\smartcook\\model\\best.pt")
 
 model.train(
-    data="C:\\Users\\Kristina\\cv_teaching\\data\\example.yaml",
-    epochs=20,
+    data="C:\\Users\\Kristina\\smartcook\\model\\data\\eggs\\train_model.yaml",
+    epochs=30,
     imgsz=640,
     batch=16,
-    name="custom_yolo11n"
+    name="yolo_bestn1"
 )

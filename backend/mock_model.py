@@ -8,7 +8,7 @@ def load_model():
     global model
     if model is None:
         print("Loading YOLO model...")
-        model = YOLO("yolo11n.pt")
+        model = YOLO("C:\\Users\\Kristina\\smartcook\\model\\best.pt")
         print("YOLO model loaded.")
 
 def detect_ingredients(image_bytes):
