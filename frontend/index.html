@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCook</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>👩‍🍳 SmartCook: AI Chef</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file" required />
+        <button type="submit">Identify Ingredients</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('fileInput').files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            document.getElementById("result").innerText = "🧠 Processing the image...";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/detect", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById("result").innerText = "🍅 Ingredients found: " + data.ingredients.join(", ");
+            } catch (err) {
+                console.error(err);
+                document.getElementById("result").innerText = "❌ Error during request";
+            }
+        };
+    </script>
+</body>
+</html>

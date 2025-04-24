@@ -1,21 +1,21 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from mock_model import detect_ingredients
-from fastapi.responses import JSONResponse
+from backend.mock_model import detect_ingredients
 
 app = FastAPI()
 
-# Разрешаем фронту обращаться к бэку
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/detect/")
+@app.post("/detect")
 async def detect(file: UploadFile = File(...)):
-    # эмуляция обработки
-    contents = await file.read()
-    ingredients = detect_ingredients(contents)
-    return JSONResponse({"ingredients": ingredients})
+    image_bytes = await file.read()
+    print("📥 Received file:", file.filename)
+    ingredients = detect_ingredients(image_bytes)
+    print("🍳 Detected:", ingredients)
+    return {"ingredients": ingredients}
