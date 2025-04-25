@@ -1,24 +1,27 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #fffefc;
+    background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
     color: #333;
     padding: 2rem;
-    max-width: 800px;
+    max-width: 1400px;
     margin: auto;
+    min-height: 100vh;
 }
 
 h1 {
-    font-size: 2.2rem;
-    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
     color: #dd4a48;
     text-align: center;
 }
 
 form {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: center;
     align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
 }
 
 input[type="file"] {
@@ -44,13 +47,75 @@ button:hover {
 }
 
 #result {
-    margin-top: 2rem;
-    font-size: 1.1rem;
+    margin-top: 1rem;
+    font-size: 1.2rem;
     text-align: center;
 }
 
 img#annotatedImage {
+    display: block;
+    margin: 1.5rem auto;
     border: 2px solid #eee;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+.recipes {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.recipe-card {
+    border: 1px solid #ddd;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    min-height: 480px; /* Минимальная высота для симметрии */
+    transition: all 0.3s ease-in-out;
+}
+
+.recipe-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.recipe-thumb {
+    max-width: 100%;
+    width: 220px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.recipe-card ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0.5rem 0;
+    text-align: left;
+    width: 100%;
+}
+
+.recipe-card li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.3rem 0;
+}
+
+.recipe-card li img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
 }
