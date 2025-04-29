@@ -1,8 +1,8 @@
 from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from backend.mock_model import detect_ingredients_and_save
 from fastapi.responses import HTMLResponse, JSONResponse
+from backend.mock_model import detect_ingredients_and_save
 import os
 import requests
 
@@ -19,22 +19,25 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/frontend", StaticFiles(directory=os.path.join(os.getcwd(), "frontend")), name="frontend")
 
+
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
     image_bytes = await file.read()
-    print("📅 File received:", file.filename)
+    print("📦 File received:", file.filename)
     ingredients, image_url = detect_ingredients_and_save(image_bytes)
-    print("🍳 Ingredients found:", ingredients)
+    print("🥕 Ingredients detected:", ingredients)
     return {"ingredients": ingredients, "image_url": image_url}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
     with open(os.path.join("frontend", "index.html"), "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read(), headers={"Content-Type": "text/html; charset=utf-8"})
 
+
 @app.get("/get_recipes")
 async def get_recipes(ingredients: list[str] = Query(...)):
-    api_key = "9232d41ffa00477ca770acf0d0f6206e"  # <-- Replace with your actual API key
+    api_key = "9232d41ffa00477ca770acf0d0f6206e"  # Replace with your real API key
     url = f"https://api.spoonacular.com/recipes/findByIngredients?ingredients={','.join(ingredients)}&number=5&apiKey={api_key}"
 
     try:
@@ -49,16 +52,10 @@ async def get_recipes(ingredients: list[str] = Query(...)):
                 "title": r["title"],
                 "image": r["image"],
                 "usedIngredients": [
-                    {
-                        "name": ing["name"],
-                        "image": ing["image"]
-                    } for ing in r.get("usedIngredients", [])
+                    {"name": ing["name"], "image": ing["image"]} for ing in r.get("usedIngredients", [])
                 ],
                 "missedIngredients": [
-                    {
-                        "name": ing["name"],
-                        "image": ing["image"]
-                    } for ing in r.get("missedIngredients", [])
+                    {"name": ing["name"], "image": ing["image"]} for ing in r.get("missedIngredients", [])
                 ]
             })
 
