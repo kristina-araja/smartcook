@@ -14,21 +14,30 @@
     </form>
 
     <div id="result"></div>
-    <img id="annotatedImage" style="max-width: 300px; margin-top: 20px; display: none;" />
-
+    <img id="annotatedImage" style="max-width: 300px; margin-top: 20px; display: none; border-radius: 12px; transition: opacity 1s ease;" />
     <div id="recipes" class="recipes"></div>
 
     <script>
         const form = document.getElementById("uploadForm");
+        const resultDiv = document.getElementById("result");
+        const imageElement = document.getElementById("annotatedImage");
+        const recipesContainer = document.getElementById("recipes");
+
+        const formatImageUrl = (url) => {
+            return url.startsWith("http")
+                ? url
+                : `https://img.spoonacular.com/ingredients_100x100/${url.split('/').pop()}`;
+        };
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             const file = document.getElementById("fileInput").files[0];
             const formData = new FormData();
             formData.append("file", file);
 
-            document.getElementById("result").innerText = "🧠 Processing image...";
-            document.getElementById("annotatedImage").style.display = "none";
-            document.getElementById("recipes").innerHTML = "";
+            resultDiv.innerText = "🧠 Processing image...";
+            imageElement.style.display = "none";
+            recipesContainer.innerHTML = "";
 
             try {
                 const detectResponse = await fetch("http://127.0.0.1:8000/detect", {
@@ -37,15 +46,35 @@
                 });
 
                 const detectData = await detectResponse.json();
-                document.getElementById("result").innerText = "🍅 Ingredients found: " + detectData.ingredients.join(", ");
-                document.getElementById("annotatedImage").src = detectData.image_url;
-                document.getElementById("annotatedImage").style.display = "block";
+                const ingredients = detectData.ingredients;
 
-                const query = detectData.ingredients.map(encodeURIComponent).join('&ingredients=');
+                imageElement.src = detectData.image_url;
+                imageElement.style.display = "block";
+
+                if (!ingredients || ingredients.length === 0) {
+                    resultDiv.innerText = "🤷 No ingredients found!";
+                    setTimeout(() => {
+                        imageElement.style.opacity = 0;
+                        setTimeout(() => {
+                            imageElement.src = "/frontend/easter/mouse.jpg";
+                            imageElement.onload = () => {
+                                imageElement.style.opacity = 1;
+                            };
+                            resultDiv.innerHTML = `
+                                <p style="text-align:center;margin-top:1rem;font-size:1.2rem;">
+                                    Out of food? <a href="https://bolt.eu/lv-lv/food/" target="_blank" style="color:#f78c6b;">Order delivery instead 🍕</a>
+                                </p>`;
+                        }, 1000);
+                    }, 2000);
+                    return;
+                }
+
+                resultDiv.innerText = "🍅 Ingredients found: " + ingredients.join(", ");
+
+                const query = ingredients.map(encodeURIComponent).join('&ingredients=');
                 const recipeResponse = await fetch(`http://127.0.0.1:8000/get_recipes?ingredients=${query}`);
                 const recipes = await recipeResponse.json();
 
-                const recipesContainer = document.getElementById("recipes");
                 recipes.forEach(recipe => {
                     const recipeCard = document.createElement("div");
                     recipeCard.className = "recipe-card";
@@ -55,18 +84,22 @@
                         <h2>${recipe.title}</h2>
                         <h3>✅ Used Ingredients:</h3>
                         <ul>
-                            ${recipe.usedIngredients.map(ing => `<li><img src="https://spoonacular.com/cdn/ingredients_100x100/${ing.image.split('/').pop()}" alt="${ing.name}" /> ${ing.name}</li>`).join('')}
+                            ${recipe.usedIngredients.map(ing => `
+                                <li><img src="${formatImageUrl(ing.image)}" alt="${ing.name}" /> ${ing.name}</li>
+                            `).join('')}
                         </ul>
                         <h3>❌ Missing Ingredients:</h3>
                         <ul>
-                            ${recipe.missedIngredients.map(ing => `<li><img src="https://spoonacular.com/cdn/ingredients_100x100/${ing.image.split('/').pop()}" alt="${ing.name}" /> ${ing.name}</li>`).join('')}
+                            ${recipe.missedIngredients.map(ing => `
+                                <li><img src="${formatImageUrl(ing.image)}" alt="${ing.name}" /> ${ing.name}</li>
+                            `).join('')}
                         </ul>
                     `;
                     recipesContainer.appendChild(recipeCard);
                 });
             } catch (err) {
                 console.error(err);
-                document.getElementById("result").innerText = "❌ Error during request";
+                resultDiv.innerText = "❌ Error during request";
             }
         };
     </script>
